@@ -25,6 +25,9 @@
     <Compile Include="data.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="emotion.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="face.py">
       <SubType>Code</SubType>
     </Compile>
@@ -40,10 +43,22 @@
     <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="test2.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="train.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="train2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="training.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="video.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="video2.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="webcam.py">

@@ -5,7 +5,7 @@ faceDet2 = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
 faceDet3 = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
 faceDet4 = cv2.CascadeClassifier("haarcascade_frontalface_alt_tree.xml")
 
-emotions = ["neutral","anger","contempt","disgust","fear","happy","sadness","surprise"]
+emotions = ["neutral","anger","disgust","fear","happy","sadness","surprise"]
 def detect_faces(emotion):
     files = glob.glob("sorted_set\\%s\\*" %emotion)
     file_number=0

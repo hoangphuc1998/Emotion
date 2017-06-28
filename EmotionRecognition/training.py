@@ -1,16 +1,15 @@
 import cv2, glob, random, math, numpy as np, dlib, itertools
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 import warnings
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from sklearn.externals import joblib
+import os
 warnings.filterwarnings("ignore")
 #Declare values
-emotions = ["neutral","anger","contempt","disgust","fear","happy","sadness","surprise"]
+emotions = ["neutral","anger","fear","disgust","happy","sadness","surprise"]
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-clf = SVC(kernel='linear', probability=True, tol=1e-3)
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat") #Or set this to whatever you named the downloaded file
+clf = SVC(kernel='linear', probability=True, tol=1e-3)#, verbose = True) #Set the classifier as a support vector machines with polynomial kernel
 #clf = KNeighborsClassifier()
 def get_files(emotion):
     files = glob.glob("dataset\\%s\\*" %emotion)
@@ -18,9 +17,10 @@ def get_files(emotion):
 
 def get_landmarks(image):
     detections = detector(image, 1)
-    for k,d in enumerate(detections): #For all detected face instances individually
-        shape = predictor(image, d) #Draw Facial Landmarks with the predictor class
-        
+    for k,d in enumerate(detections):
+        shape = predictor(image, d)
+        for i in range(1,68): #There are 68 landmark points on each face
+            cv2.circle(image, (shape.part(i).x, shape.part(i).y), 1, (0,0,255), thickness=2)
         xlist = []
         ylist = []
         for i in range(1,68): #Store X and Y coordinates in two lists
@@ -83,34 +83,4 @@ npar_train = np.array(training_data) #Turn the training set into a numpy array f
 npar_trainlabs = np.array(training_labels)
 print("Training: %s images" %len(training_labels)) #train SVM
 clf.fit(training_data, training_labels)
-cap = cv2.VideoCapture(0)
-plt.rcdefaults()
-fig = plt.figure()
-ax1 = fig.add_subplot(1,1,1)
-
-def animate(i):
-    ret, frame = cap.read()
-
-    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-    cv2.imshow("Emotion Recognition",frame)
-    clahe_image = clahe.apply(gray)
-    landmarks_vectorised = get_landmarks(clahe_image)
-    if landmarks_vectorised == "error":
-        print("No face detected")
-        return
-    else:
-        scores = clf.predict_proba(landmarks_vectorised)
-        for index in range(0,len(emotions)):
-            scores[0][index]*=100
-        y_pos = np.arange(len(emotions))
-        ax1.clear()
-        plt.barh(y_pos,scores[0],align='center',alpha=0.5)
-        plt.yticks(y_pos,emotions)
-        plt.xlabel("%")
-while (True):
-    ani = animation.FuncAnimation(fig,animate,interval=50)
-    plt.show()
-    if cv2.waitKey(1) & 0xff==ord('q'):
-        break
-cap.release()
-cv2.destroyAllWindows()
+joblib.dump(clf,'training_model.pkl',compress = 9)
